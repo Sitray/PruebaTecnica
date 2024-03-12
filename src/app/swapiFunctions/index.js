@@ -19,7 +19,12 @@ const genericRequest = async (url, method, body, logging = false) => {
     return data;
 }
 
+const getRandom = (index) => {
+    return Math.floor(Math.random() * index)
+}
+
 module.exports = {
     getWeightOnPlanet,
-    genericRequest
+    genericRequest,
+    getRandom
 }

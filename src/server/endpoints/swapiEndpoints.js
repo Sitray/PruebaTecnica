@@ -1,4 +1,5 @@
 const fetch = require('node-fetch');
+const { getWeightOnPlanet, getRandom } = require('../../app/swapiFunctions');
 
 const _isWookieeFormat = (req) => {
     if(req.query.format && req.query.format == 'wookiee'){
@@ -56,20 +57,19 @@ const applySwapiEndpoints = (server, app) => {
         try {
             const resultsPeople = await fetch("https://swapi.py4e.com/api/people");
             const getAllPeople = await resultsPeople.json();
-            const randomPerson = getAllPeople.results[Math.floor(Math.random() * getAllPeople.results.length)];
-    
+            const randomPerson = getAllPeople.results[getRandom(getAllPeople.results.length)];
+
             const resultsPlanet = await fetch("https://swapi.py4e.com/api/planets");
             const getAllPlanets = await resultsPlanet.json();
-            const randomPlanet = getAllPlanets.results[Math.floor(Math.random() * getAllPlanets.results.length)];
+            const randomPlanet = getAllPlanets.results[getRandom(getAllPlanets.results.length)];
     
             //si viene de swapi
             if(randomPerson.homeworld === randomPlanet.url){
-                console.log("entra if")    
                 res.status(500).send({message: 'El planeta es el mismo'})     
             }
       
-            const getFirstNumberFromGravity = parseFloat(randomPlanet.gravity === 'N/A' ? 1 : randomPlanet.gravity) ; 
-            const characterWeight = randomPerson.mass * getFirstNumberFromGravity;
+            const getFirstNumberFromGravity = parseFloat(randomPlanet.gravity === 'N/A' ? 1 : randomPlanet.gravity); 
+            const characterWeight = getWeightOnPlanet(randomPerson.mass, getFirstNumberFromGravity);
             const character = {
                 name: randomPerson.name,
                 planet: randomPlanet.name,
