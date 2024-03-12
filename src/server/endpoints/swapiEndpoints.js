@@ -19,6 +19,7 @@ const applySwapiEndpoints = (server, app) => {
         try {
             const people = await app.db.swPeople.findByPk(id);
 
+            // people ? res.json(people) : res.sendStatus(404);
             if(people) {
                 res.json(people);
             } else {
@@ -29,11 +30,21 @@ const applySwapiEndpoints = (server, app) => {
             res.status(500).send('Error fetching people');
         }
 
-        res.sendStatus(501);
     });
 
     server.get('/hfswapi/getPlanet/:id', async (req, res) => {
-        res.sendStatus(501);
+        const { id } = req.params;
+
+        try {
+            const planet = await app.db.swPlanet.findByPk(id);
+
+            //TODO: LLamar funcion generica para obtener el planeta
+            planet ? res.json(planet) : res.sendStatus(404);
+        } catch (error) {
+            console.error('Error fetching planet:', error);
+            res.status(500).send('Error fetching planet');
+        }
+
     });
 
     server.get('/hfswapi/getWeightOnPlanetRandom', async (req, res) => {
