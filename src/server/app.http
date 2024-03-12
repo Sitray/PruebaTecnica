@@ -1,5 +1,5 @@
 ###  GetPepole by id
-GET  http://localhost:4567/hfswapi/getPeople/3
+GET  http://localhost:4567/hfswapi/getPeople/3?format=wookiee
 
 ### Geet planet  by id
 GET  http://localhost:4567/hfswapi/getPlanet/2

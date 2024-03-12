@@ -18,7 +18,8 @@ const applySwapiEndpoints = (server, app) => {
 
     server.get('/hfswapi/getPeople/:id', async (req, res, next) => {
         const { id } = req.params;
-        const people = await PeopleModel.getPeopleById(id, app);
+        const isWookiee = _isWookieeFormat(req) ? '?format=wookiee' : '';
+        const people = await PeopleModel.getPeopleById(id, app, isWookiee);
         if(!people) res.status(500).send({message:'Error buscando a la persona'}); 
 
         res.json(people);
@@ -36,9 +37,10 @@ const applySwapiEndpoints = (server, app) => {
 
     });
 
-    server.get('/hfswapi/getWeightOnPlanetRandom', async (req, res) => {
+    server.get('/hfswapi/getWeightOnPlanetRandom', async (req, res, next) => {
         const character = await PlanetModel.getWeightOnPlanetRandom(app);
         res.json(character)
+        next()
     });
 
     server.get('/hfswapi/getLogs',async (req, res) => {

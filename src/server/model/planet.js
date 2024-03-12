@@ -12,14 +12,14 @@ class PlanetModel {
       } else {
           const  response = await genericRequest(`https://swapi.py4e.com/api/planets/${id}`, 'GET', null, false)
           const parsedResponse = {
-              namme: response.name,
-              gravity: response.gravity
+            namme: response.name,
+            gravity: response.gravity
           }
         return parsedResponse
       }
     } catch (error) {
-        console.error('Error no se encontro el planeta:', error);
-       return  null
+      console.error('Error no se encontro el planeta:', error);
+      return  null
     }
   }
 
@@ -28,15 +28,15 @@ class PlanetModel {
       const [person, planet] = await Promise.all([getRandomPerson(app), getRandomPlanet(app)]);
 
       if (person && planet) {
-          if (person.homeworld_name === planet.name) {
-              throw new Error('La persona y el planeta son el mismo');
-          }
+        if (person.homeworld_name === planet.name) {
+          throw new Error('La persona y el planeta son el mismo');
+        }
 
-          return {
-              name: person.name,
-              planet: planet.name,
-              characterWeight: getWeightOnPlanet(person.mass, planet.gravity)
-            }
+        return {
+          name: person.name,
+          planet: planet.name,
+          characterWeight: getWeightOnPlanet(person.mass, planet.gravity)
+        }
       }
 
       const character = await getCharacterFromAPI(getRandom(88), getRandom(61));

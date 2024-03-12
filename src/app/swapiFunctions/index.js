@@ -39,8 +39,6 @@ const getCharacterFromAPI = async (personPosition, planetPosition) => {
         genericRequest(`https://swapi.py4e.com/api/planets/${planetPosition}`, 'GET', null, false)
     ]);
 
-    console.log(personResponse, planetResponse)
-
     if (personResponse.status === 404 || planetResponse.status === 404) {
         throw new Error('No se encontró la persona o el planeta');
     }
@@ -65,11 +63,46 @@ const getCharacterFromAPI = async (personPosition, planetPosition) => {
     };
 }
 
+const wookieeToEnglish = {
+    'whrascwo': 'name',
+    'acwoahrracao': 'height',
+    'scracc': 'mass',
+    'acraahrc_oaooanoorc': 'hair_color',
+    'corahwh_oaooanoorc': 'skin_color',
+    'worowo_oaooanoorc': 'eye_color',
+    'rhahrcaoac_roworarc': 'birth_year',
+    'rrwowhwaworc': 'gender',
+    'acooscwoohoorcanwa': 'homeworld',
+    'wwahanscc': 'films',
+    'cakwooaahwoc': 'species',
+    'howoacahoaanwoc': 'vehicles',
+    'caorarccacahakc': 'starships',
+    'oarcworaaowowa': 'created',
+    'wowaahaowowa': 'edited',
+    'hurcan': 'url'
+};
+
+const translateWookieeToEnglish = (wookieeObject) => {
+    const englishObject = {};
+
+    for (const key in wookieeObject) {
+        const englishKey = wookieeToEnglish[key];
+        if (englishKey) {
+            englishObject[englishKey] = wookieeObject[key];
+        } else {
+            englishObject[key] = wookieeObject[key];
+        }
+    }
+    
+    return englishObject;
+}
+
 module.exports = {
     getWeightOnPlanet,
     genericRequest,
     getRandom,
     getRandomPerson,
     getRandomPlanet,
-    getCharacterFromAPI
+    getCharacterFromAPI,
+    translateWookieeToEnglish
 }
