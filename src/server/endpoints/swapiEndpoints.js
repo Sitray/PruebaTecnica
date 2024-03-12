@@ -1,3 +1,4 @@
+const fetch = require('node-fetch');
 
 const _isWookieeFormat = (req) => {
     if(req.query.format && req.query.format == 'wookiee'){
@@ -52,7 +53,34 @@ const applySwapiEndpoints = (server, app) => {
     });
 
     server.get('/hfswapi/getWeightOnPlanetRandom', async (req, res) => {
-        res.sendStatus(501);
+        try {
+            const resultsPeople = await fetch("https://swapi.py4e.com/api/people");
+            const getAllPeople = await resultsPeople.json();
+            const randomPerson = getAllPeople.results[Math.floor(Math.random() * getAllPeople.results.length)];
+    
+            const resultsPlanet = await fetch("https://swapi.py4e.com/api/planets");
+            const getAllPlanets = await resultsPlanet.json();
+            const randomPlanet = getAllPlanets.results[Math.floor(Math.random() * getAllPlanets.results.length)];
+    
+            //si viene de swapi
+            if(randomPerson.homeworld === randomPlanet.url){
+                console.log("entra if")    
+                res.status(500).send({message: 'El planeta es el mismo'})     
+            }
+      
+            const getFirstNumberFromGravity = parseFloat(randomPlanet.gravity === 'N/A' ? 1 : randomPlanet.gravity) ; 
+            const characterWeight = randomPerson.mass * getFirstNumberFromGravity;
+            const character = {
+                name: randomPerson.name,
+                planet: randomPlanet.name,
+                characterWeight: characterWeight
+            }
+
+             res.json(character)
+        } catch (error) {
+            
+        }
+
     });
 
     server.get('/hfswapi/getLogs',async (req, res) => {
