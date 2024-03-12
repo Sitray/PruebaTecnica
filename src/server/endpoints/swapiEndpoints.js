@@ -17,7 +17,9 @@ const applySwapiEndpoints = (server, app) => {
         const { id } = req.params;
 
         try {
-            const people = await app.db.swPeople.findByPk(id);
+            const people = await app.db.swPeople.findByPk(id, {
+                attributes: ['name', 'mass', 'height', 'homeworld_name', 'homeworld_id']
+            });
 
             // people ? res.json(people) : res.sendStatus(404);
             if(people) {
@@ -36,7 +38,9 @@ const applySwapiEndpoints = (server, app) => {
         const { id } = req.params;
 
         try {
-            const planet = await app.db.swPlanet.findByPk(id);
+            const planet = await app.db.swPlanet.findByPk(id, {
+                attributes: ['name', 'gravity']
+            });
 
             //TODO: LLamar funcion generica para obtener el planeta
             planet ? res.json(planet) : res.sendStatus(404);
