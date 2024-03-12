@@ -1,4 +1,5 @@
-const { genericRequest, getWeightOnPlanet, getRandom, getRandomPerson, getRandomPlanet, getCharacterFromAPI  } = require('../../app/swapiFunctions');
+const { genericRequest, getWeightOnPlanet, getRandom } = require('../../app/swapiFunctions');
+const { PeopleModel } = require('./people');
 
 class PlanetModel {
   static async getPlanetById(id, app) {
@@ -12,35 +13,36 @@ class PlanetModel {
       } else {
           const  response = await genericRequest(`https://swapi.py4e.com/api/planets/${id}`, 'GET', null, false)
           const parsedResponse = {
-            namme: response.name,
+            name: response.name,
             gravity: response.gravity
           }
+          console.log(parsedResponse)
         return parsedResponse
       }
     } catch (error) {
       console.error('Error no se encontro el planeta:', error);
       return  null
     }
+
   }
 
   static async getWeightOnPlanetRandom(app) {
     try {
-      const [person, planet] = await Promise.all([getRandomPerson(app), getRandomPlanet(app)]);
+      const [person, planet] = await Promise.all([PeopleModel.getPeopleById(getRandom(88), app, ''), this.getPlanetById(getRandom(61), app)]);
 
-      if (person && planet) {
-        if (person.homeworld_name === planet.name) {
-          throw new Error('La persona y el planeta son el mismo');
-        }
-
-        return {
-          name: person.name,
-          planet: planet.name,
-          characterWeight: getWeightOnPlanet(person.mass, planet.gravity)
-        }
+      const parsedGravity = parseFloat(planet.gravity);
+      const parsedMass = parseFloat(person.mass);
+  
+      if (isNaN(parsedGravity) || isNaN(parsedMass)) {
+          throw new Error('Falta la gravidad o la masa del personaje');
       }
 
-      const character = await getCharacterFromAPI(getRandom(88), getRandom(61));
-      return character
+      return {
+        name: person.name,
+        planet: planet.name,
+        characterWeight: getWeightOnPlanet(parsedMass, parsedGravity)
+      }
+
   } catch (error) {
       console.error('Error fetching character:', error);
       throw new Error(error.message);
