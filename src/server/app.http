@@ -1,8 +1,8 @@
 ###  GetPepole by id
-GET  http://localhost:4567/hfswapi/getPeople/1
+GET  http://localhost:4567/hfswapi/getPeople/3
 
 ### Geet planet  by id
-GET  http://localhost:4567/hfswapi/getPlanet/3
+GET  http://localhost:4567/hfswapi/getPlanet/2
 
 ### Get weight on planet random
 GET  http://localhost:4567/hfswapi/getWeightOnPlanetRandom/
