@@ -1,5 +1,5 @@
 const fetch = require('node-fetch');
-const { getWeightOnPlanet, getRandom } = require('../../app/swapiFunctions');
+const { getWeightOnPlanet, getRandom, genericRequest } = require('../../app/swapiFunctions');
 
 const _isWookieeFormat = (req) => {
     if(req.query.format && req.query.format == 'wookiee'){
@@ -15,7 +15,7 @@ const applySwapiEndpoints = (server, app) => {
         res.send(data);
     });
 
-    server.get('/hfswapi/getPeople/:id', async (req, res) => {
+    server.get('/hfswapi/getPeople/:id', async (req, res, next) => {
         const { id } = req.params;
 
         try {
@@ -23,11 +23,18 @@ const applySwapiEndpoints = (server, app) => {
                 attributes: ['name', 'mass', 'height', 'homeworld_name', 'homeworld_id']
             });
 
-            // people ? res.json(people) : res.sendStatus(404);
             if(people) {
                 res.json(people);
             } else {
-                //TODO: Hacer la llamada a https://swapi.py4e.com/api/ (hacer un metodo generico)
+              const response = await genericRequest(`https://swapi.py4e.com/api/people/${id}`, 'GET', null, false)
+              const parsedResponse = {
+                name: response.name,
+                mass: response.mass,
+                height: response.height,
+                hoemworld: response.homeworld
+              }
+              res.json(parsedResponse)
+              next()
             }
         } catch (error) {
             console.error('Error fetching people:', error);
@@ -36,16 +43,25 @@ const applySwapiEndpoints = (server, app) => {
 
     });
 
-    server.get('/hfswapi/getPlanet/:id', async (req, res) => {
+    server.get('/hfswapi/getPlanet/:id', async (req, res,  next) => {
         const { id } = req.params;
 
         try {
             const planet = await app.db.swPlanet.findByPk(id, {
                 attributes: ['name', 'gravity']
             });
+            if(planet) {
+                res.json(planet);
+            } else {
+                const  response = await genericRequest(`https://swapi.py4e.com/api/planets/${id}`, 'GET', null, false)
+                const parsedResponse = {
+                    namme: response.name,
+                    gravity: response.gravity
+                }
 
-            //TODO: LLamar funcion generica para obtener el planeta
-            planet ? res.json(planet) : res.sendStatus(404);
+                res.json(parsedResponse)
+                next()
+            }
         } catch (error) {
             console.error('Error fetching planet:', error);
             res.status(500).send('Error fetching planet');
