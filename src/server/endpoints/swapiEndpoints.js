@@ -55,30 +55,59 @@ const applySwapiEndpoints = (server, app) => {
 
     server.get('/hfswapi/getWeightOnPlanetRandom', async (req, res) => {
         try {
-            const resultsPeople = await fetch("https://swapi.py4e.com/api/people");
-            const getAllPeople = await resultsPeople.json();
-            const randomPerson = getAllPeople.results[getRandom(getAllPeople.results.length)];
+            const randomPositionPerson = getRandom(88)
+            const randomPositionPlanet = getRandom(61)
+            const findPeople = await app.db.swPeople.findAll();
+            const findPlanet = await app.db.swPlanet.findAll();
 
-            const resultsPlanet = await fetch("https://swapi.py4e.com/api/planets");
-            const getAllPlanets = await resultsPlanet.json();
-            const randomPlanet = getAllPlanets.results[getRandom(getAllPlanets.results.length)];
-    
-            //si viene de swapi
-            if(randomPerson.homeworld === randomPlanet.url){
-                res.status(500).send({message: 'El planeta es el mismo'})     
-            }
-      
-            const getFirstNumberFromGravity = parseFloat(randomPlanet.gravity === 'N/A' ? 1 : randomPlanet.gravity); 
-            const characterWeight = getWeightOnPlanet(randomPerson.mass, getFirstNumberFromGravity);
-            const character = {
-                name: randomPerson.name,
-                planet: randomPlanet.name,
-                characterWeight: characterWeight
+            if(findPeople[randomPositionPerson] && findPlanet[randomPositionPlanet]) {
+                const person = findPeople[randomPositionPerson];
+                const planet = findPlanet[randomPositionPlanet];
+                if(person.homeworld_name === planet.name){ res.status(500).send({message: 'El planeta es el mismo'})}
+                
+
+                const character = {
+                    name: person.name,
+                    planet: planet.name,
+                    characterWeight: getWeightOnPlanet(person.mass, planet.gravity)
+                }
+
+                res.json(character)
+            } else {
+
+                const resultsPeople = await fetch(`https://swapi.py4e.com/api/people/${randomPositionPerson}`);
+                const randomPerson = await resultsPeople.json();
+        
+                const resultsPlanet = await fetch(`https://swapi.py4e.com/api/planets/${randomPositionPlanet}`);
+                const randomPlanet = await resultsPlanet.json();
+
+                if(resultsPeople.status === 404 || resultsPlanet.status === 404) { 
+                    res.status(500).send({message: resultsPeople.statusText})
+                }
+
+                if (randomPerson.homeworld === randomPlanet.url) {
+                    res.status(500).send({ message: 'El planeta es el mismo de SWAPI' });
+                }
+                const parsedGravity = parseFloat(randomPlanet.gravity);
+                const parsedMass = parseFloat(randomPerson.mass);
+                
+                if (isNaN(parsedGravity) || isNaN(parsedMass)) {
+                    res.status(500).send({ message: 'No hay  datos de masa o gravedad' });
+                }
+
+                const characterWeight = getWeightOnPlanet(parsedGravity, parsedMass);
+                const character = {
+                    name: randomPerson.name,
+                    planet: randomPlanet.name,
+                    characterWeight: characterWeight
+                };
+        
+                res.json(character);
             }
 
-             res.json(character)
         } catch (error) {
-            
+            console.error('Error fetching planet:', error);
+            res.status(500).send('Error fetching planet');
         }
 
     });
