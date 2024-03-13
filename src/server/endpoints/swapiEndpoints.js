@@ -39,6 +39,8 @@ const applySwapiEndpoints = (server, app) => {
 
     server.get('/hfswapi/getWeightOnPlanetRandom', async (req, res, next) => {
         const character = await PlanetModel.getWeightOnPlanetRandom(app);
+        if(!character) res.status(500).send({message:'Error devolviendo el peso del personaje'});
+        
         res.json(character)
         next()
     });

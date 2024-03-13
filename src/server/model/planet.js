@@ -16,7 +16,7 @@ class PlanetModel {
             name: response.name,
             gravity: response.gravity
           }
-          console.log(parsedResponse)
+          
         return parsedResponse
       }
     } catch (error) {
